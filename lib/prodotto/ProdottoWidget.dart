@@ -10,8 +10,8 @@ class ProdottoWidget extends StatelessWidget {
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("${prodotto.nome!}         "),
-          Text(prodotto.prezzo!.toStringAsFixed(2))
+          Text("${prodotto.nome}         "),
+          Text(prodotto.prezzo.toStringAsFixed(2))
         ]
     );
   }

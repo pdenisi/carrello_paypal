@@ -9,22 +9,22 @@ Map<dynamic, dynamic> defaultCurrency = {
 };
 
 class RigaCarrello {
-  final Prodotto? prodotto;
-  final int? quantita = 1;
+  final Prodotto prodotto;
+  final int quantita = 1;
 
   RigaCarrello({
-    this.prodotto,
+    required this.prodotto,
   });
 
   double calcolaTotalePrezzoProdotto(){
-    return this.prodotto!.prezzo!*quantita!;
+    return this.prodotto.prezzo*quantita;
   }
 
   Map<String, dynamic> toCarrelloItem(){
     return {
-      "name": prodotto!.nome,
+      "name": prodotto.nome,
       "quantity": quantita,
-      "price": prodotto!.prezzo,
+      "price": prodotto.prezzo,
       "currency": defaultCurrency["currency"]
     };
   }

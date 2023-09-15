@@ -1,4 +1,3 @@
-import 'package:carrello_paypal/carrello/CarrelloWidget.dart';
 import 'package:carrello_paypal/PaginaPagamento.dart';
 import 'package:flutter/material.dart';
 

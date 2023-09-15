@@ -1,11 +1,11 @@
 class Prodotto {
-  String? nome;
-  String? descrizione;
-  double? prezzo;
+  final String nome;
+  final String descrizione;
+  final double prezzo;
 
   Prodotto({
-    this.nome,
-    this.descrizione,
-    this.prezzo,
+    required this.nome,
+    required this.descrizione,
+    required this.prezzo,
   });
 }

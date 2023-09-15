@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'package:carrello_paypal/carrello/Carrello.dart';
 import 'package:flutter/material.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
@@ -7,8 +8,9 @@ import 'paypal_services.dart';
 
 class Payment extends StatefulWidget {
   final Function? onFinish;
+  final Carrello carrello;
 
-  const Payment({Key? key, this.onFinish}) : super(key: key);
+  const Payment({Key? key, this.onFinish, required this.carrello}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -77,6 +79,59 @@ class PaymentState extends State<Payment> {
   String itemPrice = '10';
   int quantity = 1;
 
+  /*
+  Map<String, dynamic> getOrderParams() {
+    List items = [
+      {
+        "name": itemName,
+        "quantity": quantity,
+        "price": itemPrice,
+        "currency": defaultCurrency["currency"]
+      }
+    ];
+
+    // checkout invoice details
+
+    Map<String, dynamic> temp = {
+      "intent": "sale",
+      "payer": {"payment_method": "paypal"},
+      "transactions": [
+        {
+          "amount": {
+            "total": widget.carrello.totale,
+            "currency": defaultCurrency["currency"],
+            "details": {
+              "subtotal": widget.carrello.subTotale,
+              "shipping": widget.carrello.spedizione.shippingCost,
+              "shipping_discount": ((-1.0) * widget.carrello.spedizione.shippingDiscountCost).toString()
+            }
+          },
+          "description": "The payment transaction description.",
+          "payment_options": {
+            "allowed_payment_method": "INSTANT_FUNDING_SOURCE"
+          },
+          "item_list": {
+            "items": items,
+            if (isEnableShipping && isEnableAddress)
+              "shipping_address": {
+                "recipient_name": widget.carrello.utente.userFirstName + " " + widget.carrello.utente.userLastName,
+                "line1": widget.carrello.spedizione.addressStreet,
+                "line2": "",
+                "city": widget.carrello.spedizione.addressCity,
+                "country_code": widget.carrello.spedizione.addressCountry,
+                "postal_code": widget.carrello.spedizione.addressZipCode,
+                "phone": widget.carrello.spedizione.addressPhoneNumber,
+                "state": widget.carrello.spedizione.addressState
+              },
+          }
+        }
+      ],
+      "note_to_payer": "Contact us for any questions on your order.",
+      "redirect_urls": {"return_url": returnURL, "cancel_url": cancelURL}
+    };
+    return temp;
+  }
+  */
   Map<String, dynamic> getOrderParams() {
     List items = [
       {
@@ -140,7 +195,6 @@ class PaymentState extends State<Payment> {
     };
     return temp;
   }
-
 
   navigationDelegate(NavigationRequest request){
       if (request.url.contains(returnURL)) {
