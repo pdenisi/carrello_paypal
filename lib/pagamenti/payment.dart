@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:ffi';
 import 'package:carrello_paypal/carrello/Carrello.dart';
 import 'package:flutter/material.dart';
 
@@ -27,12 +28,18 @@ class PaymentState extends State<Payment> {
 
   late final WebViewController _controller;
 
-  // you can change default value according to your desired
+  /* you can change default value according to your desired
   Map<dynamic, dynamic> defaultCurrency = {
     "symbol": "USD ",
     "decimalDigits": 2,
     "symbolBeforeTheNumber": true,
     "currency": "USD"
+  };*/
+  Map<dynamic, dynamic> defaultCurrency = {
+    "symbol": "EUR ",
+    "decimalDigits": 2,
+    "symbolBeforeTheNumber": true,
+    "currency": "EUR"
   };
 
   bool isEnableShipping = false;
@@ -50,6 +57,7 @@ class PaymentState extends State<Payment> {
         accessToken = await services.getAccessToken();
 
         final transactions = getOrderParams();
+        print(transactions);
         final res =
         await services.createPaypalPayment(transactions, accessToken);
         if (res != null) {
@@ -76,8 +84,13 @@ class PaymentState extends State<Payment> {
 
   // item name, price and quantity
   String itemName = 'telefono cinese';
-  String itemPrice = '10';
+  String itemPrice = '2';
   int quantity = 1;
+
+  /* todo
+  subtotal has to be Price * Quantity
+  Whereas Total has to be Tax + shipping + subtotal
+  * */
 
   /*
   Map<String, dynamic> getOrderParams() {
@@ -137,24 +150,24 @@ class PaymentState extends State<Payment> {
       {
         "name": itemName,
         "quantity": quantity,
-        "price": itemPrice,
+        "price": widget.carrello.calcolaTotale().toStringAsFixed(2),
         "currency": defaultCurrency["currency"]
       }
     ];
 
     // checkout invoice details
-    String totalAmount = '10';
-    String subTotalAmount = '10';
+    String subTotalAmount = widget.carrello.calcolaTotale().toStringAsFixed(2);
     String shippingCost = '0';
+    String totalAmount = (double.parse(subTotalAmount) + double.parse(shippingCost)).toStringAsFixed(2);
     int shippingDiscountCost = 0;
-    String userFirstName = 'john';
-    String userLastName = 'smith';
-    String addressCity = 'USA';
-    String addressStreet = "i-10";
-    String addressZipCode = '44000';
-    String addressCountry = 'Pakistan';
-    String addressState = 'Islamabad';
-    String addressPhoneNumber = '+1 223 6161 789';
+    String userFirstName = widget.carrello.utente.userFirstName;
+    String userLastName = widget.carrello.utente.userLastName;
+    String addressCity = widget.carrello.spedizione.addressCity;
+    String addressStreet = widget.carrello.spedizione.addressStreet;
+    String addressZipCode = widget.carrello.spedizione.addressZipCode;
+    String addressCountry = widget.carrello.spedizione.addressCountry;
+    String addressState = widget.carrello.spedizione.addressState;
+    String addressPhoneNumber = widget.carrello.spedizione.addressPhoneNumber;
 
     Map<String, dynamic> temp = {
       "intent": "sale",
