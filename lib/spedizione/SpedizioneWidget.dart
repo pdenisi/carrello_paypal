@@ -23,9 +23,9 @@ class SpedizioneWidget extends StatelessWidget {
           ),
           Column(
             children: [
-              Text("€ ${spedizione.shippingCost.toStringAsFixed(2)}"),
+              Text("Costo spedizione: € ${spedizione.shippingCost.toStringAsFixed(2)}"),
               Text("Sconto: ${spedizione.shippingDiscountCost.toString()}%"),
-              Text("€ ${spedizione.calcolaCostiSpedizione().toStringAsFixed(2)}")
+              Text("Costo scontato: € ${spedizione.calcolaCostiSpedizione().toStringAsFixed(2)}")
             ],
           ),
         ],

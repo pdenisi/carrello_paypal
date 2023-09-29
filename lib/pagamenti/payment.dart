@@ -1,17 +1,18 @@
 import 'dart:core';
-import 'dart:ffi';
 import 'package:carrello_paypal/carrello/Carrello.dart';
+import 'package:carrello_paypal/pagamenti/CalcolatoreTotale.dart';
+import 'package:carrello_paypal/pagamenti/Valute.dart';
+import 'package:carrello_paypal/spedizione/Spedizione.dart';
 import 'package:flutter/material.dart';
-
 import 'package:webview_flutter/webview_flutter.dart';
-
 import 'paypal_services.dart';
 
 class Payment extends StatefulWidget {
   final Function? onFinish;
   final Carrello carrello;
+  final Spedizione spedizione;
 
-  const Payment({Key? key, this.onFinish, required this.carrello}) : super(key: key);
+  const Payment({Key? key, this.onFinish, required this.carrello, required this.spedizione}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -25,33 +26,15 @@ class PaymentState extends State<Payment> {
   String? executeUrl;
   String? accessToken;
   PaypalServices services = PaypalServices();
-
   late final WebViewController _controller;
-
-  /* you can change default value according to your desired
-  Map<dynamic, dynamic> defaultCurrency = {
-    "symbol": "USD ",
-    "decimalDigits": 2,
-    "symbolBeforeTheNumber": true,
-    "currency": "USD"
-  };*/
-  Map<dynamic, dynamic> defaultCurrency = {
-    "symbol": "EUR ",
-    "decimalDigits": 2,
-    "symbolBeforeTheNumber": true,
-    "currency": "EUR"
-  };
-
   bool isEnableShipping = false;
   bool isEnableAddress = false;
-
   String returnURL = 'return.example.com';
   String cancelURL = 'cancel.example.com';
 
   @override
   void initState() {
     super.initState();
-
     Future.delayed(Duration.zero, () async {
       try {
         accessToken = await services.getAccessToken();
@@ -82,92 +65,48 @@ class PaymentState extends State<Payment> {
     });
   }
 
-  // item name, price and quantity
-  String itemName = 'telefono cinese';
-  String itemPrice = '2';
-  int quantity = 1;
-
   /* todo
+  subtotal
+  Price
+  Quantity
+  shipping
+  subtotal
+
   subtotal has to be Price * Quantity
   Whereas Total has to be Tax + shipping + subtotal
   * */
-
-  /*
   Map<String, dynamic> getOrderParams() {
+    String itemName = 'telefono cinese';
+    int quantity = 1;
+    //String shippingCost = '0';
+    //String itemPrice = '10';//widget.carrello.calcolaTotale().toStringAsFixed(2);
+    //String subTotalAmount =  '10';//widget.carrello.calcolaTotale().toStringAsFixed(2);
+    //String totalAmount = '10';//(double.parse(subTotalAmount) + double.parse(shippingCost)).toStringAsFixed(2);
+    int shippingDiscountCost = 0;
+    String shippingCost = widget.spedizione.calcolaCostiSpedizione().toStringAsFixed(2);
+    String itemPrice = widget.carrello.calcolaSubtotale().toStringAsFixed(2);
+    String subTotalAmount = (widget.carrello.calcolaSubtotale()*quantity).toStringAsFixed(2);
+    String totalAmount = CalcolatoreTotale.calcolaTotale(widget.spedizione, widget.carrello, 0).toStringAsFixed(2);
+    String userFirstName = widget.carrello.utente.userFirstName;
+    String userLastName = widget.carrello.utente.userLastName;
+    String addressCity = widget.spedizione.addressCity;
+    String addressStreet = widget.spedizione.addressStreet;
+    String addressZipCode = widget.spedizione.addressZipCode;
+    String addressCountry = widget.spedizione.addressCountry;
+    String addressState = widget.spedizione.addressState;
+    String addressPhoneNumber = widget.spedizione.addressPhoneNumber;
+    String noteAcquisto = "Contact us for any questions on your order.";
+    String descrizione = "The payment transaction description.";
+    Map<dynamic,dynamic> valuta = Valuta.euro;
+
     List items = [
       {
         "name": itemName,
         "quantity": quantity,
         "price": itemPrice,
-        "currency": defaultCurrency["currency"]
+        "currency": valuta["currency"]
       }
     ];
-
-    // checkout invoice details
-
-    Map<String, dynamic> temp = {
-      "intent": "sale",
-      "payer": {"payment_method": "paypal"},
-      "transactions": [
-        {
-          "amount": {
-            "total": widget.carrello.totale,
-            "currency": defaultCurrency["currency"],
-            "details": {
-              "subtotal": widget.carrello.subTotale,
-              "shipping": widget.carrello.spedizione.shippingCost,
-              "shipping_discount": ((-1.0) * widget.carrello.spedizione.shippingDiscountCost).toString()
-            }
-          },
-          "description": "The payment transaction description.",
-          "payment_options": {
-            "allowed_payment_method": "INSTANT_FUNDING_SOURCE"
-          },
-          "item_list": {
-            "items": items,
-            if (isEnableShipping && isEnableAddress)
-              "shipping_address": {
-                "recipient_name": widget.carrello.utente.userFirstName + " " + widget.carrello.utente.userLastName,
-                "line1": widget.carrello.spedizione.addressStreet,
-                "line2": "",
-                "city": widget.carrello.spedizione.addressCity,
-                "country_code": widget.carrello.spedizione.addressCountry,
-                "postal_code": widget.carrello.spedizione.addressZipCode,
-                "phone": widget.carrello.spedizione.addressPhoneNumber,
-                "state": widget.carrello.spedizione.addressState
-              },
-          }
-        }
-      ],
-      "note_to_payer": "Contact us for any questions on your order.",
-      "redirect_urls": {"return_url": returnURL, "cancel_url": cancelURL}
-    };
-    return temp;
-  }
-  */
-  Map<String, dynamic> getOrderParams() {
-    List items = [
-      {
-        "name": itemName,
-        "quantity": quantity,
-        "price": widget.carrello.calcolaTotale().toStringAsFixed(2),
-        "currency": defaultCurrency["currency"]
-      }
-    ];
-
-    // checkout invoice details
-    String subTotalAmount = widget.carrello.calcolaTotale().toStringAsFixed(2);
-    String shippingCost = '0';
-    String totalAmount = (double.parse(subTotalAmount) + double.parse(shippingCost)).toStringAsFixed(2);
-    int shippingDiscountCost = 0;
-    String userFirstName = widget.carrello.utente.userFirstName;
-    String userLastName = widget.carrello.utente.userLastName;
-    String addressCity = widget.carrello.spedizione.addressCity;
-    String addressStreet = widget.carrello.spedizione.addressStreet;
-    String addressZipCode = widget.carrello.spedizione.addressZipCode;
-    String addressCountry = widget.carrello.spedizione.addressCountry;
-    String addressState = widget.carrello.spedizione.addressState;
-    String addressPhoneNumber = widget.carrello.spedizione.addressPhoneNumber;
 
     Map<String, dynamic> temp = {
       "intent": "sale",
@@ -176,14 +115,14 @@ class PaymentState extends State<Payment> {
         {
           "amount": {
             "total": totalAmount,
-            "currency": defaultCurrency["currency"],
+            "currency": valuta["currency"],
             "details": {
               "subtotal": subTotalAmount,
               "shipping": shippingCost,
               "shipping_discount": ((-1.0) * shippingDiscountCost).toString()
             }
           },
-          "description": "The payment transaction description.",
+          "description": descrizione,
           "payment_options": {
             "allowed_payment_method": "INSTANT_FUNDING_SOURCE"
           },
@@ -203,7 +142,7 @@ class PaymentState extends State<Payment> {
           }
         }
       ],
-      "note_to_payer": "Contact us for any questions on your order.",
+      "note_to_payer": noteAcquisto,
       "redirect_urls": {"return_url": returnURL, "cancel_url": cancelURL}
     };
     return temp;
@@ -211,7 +150,6 @@ class PaymentState extends State<Payment> {
 
   navigationDelegate(NavigationRequest request){
       if (request.url.contains(returnURL)) {
-        print("caso1");
         final uri = Uri.parse(request.url);
         final payerID = uri.queryParameters['PayerID'];
         if (payerID != null) {
@@ -227,29 +165,21 @@ class PaymentState extends State<Payment> {
         //Navigator.of(context).pop();
       }
       if (request.url.contains(cancelURL)) {
-        print("caso2");
         Navigator.of(context).pop();
       }
-      print("arrivo alla return");
       return NavigationDecision.navigate;
   }
 
   @override
   Widget build(BuildContext context) {
-    print(checkoutUrl);
-
     if (checkoutUrl != null) {
-
       _controller = WebViewController()..setJavaScriptMode(JavaScriptMode.unrestricted)
         ..setNavigationDelegate(NavigationDelegate(
           onNavigationRequest: (NavigationRequest request) {
             return navigationDelegate(request);
           },
         ));
-
-
       _controller.loadRequest(Uri.parse(checkoutUrl!));
-
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).backgroundColor,

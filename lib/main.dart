@@ -1,4 +1,6 @@
 import 'package:carrello_paypal/PaginaPagamento.dart';
+import 'package:carrello_paypal/carrello/Carrello.dart';
+import 'package:carrello_paypal/spedizione/Spedizione.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -71,12 +73,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Carrello carrello = Carrello();
+    int shippingDiscountCost = 0;
+    Spedizione spedizione = Spedizione(
+      shippingCost: 5.99,
+      shippingDiscountCost: shippingDiscountCost,
+      addressCity: "Scampia",
+      addressStreet: "Vele",
+      addressZipCode: "80013",
+      addressCountry: "Italia",
+      addressState: "Napoli",
+      addressPhoneNumber: "+1 223 6161 789",
+    );
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: PaginaPagamento(),
+      body: PaginaPagamento(carrello: carrello, spedizione: spedizione,),
     );
   }
 }
