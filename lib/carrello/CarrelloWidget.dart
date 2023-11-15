@@ -1,5 +1,4 @@
 import 'package:carrello_paypal/carrello/Carrello.dart';
-import 'package:carrello_paypal/carrello/riga_carrello/RigaCarrello.dart';
 import 'package:carrello_paypal/carrello/riga_carrello/RigaCarrelloWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,8 +22,9 @@ class CarrelloWidgetState extends State<CarrelloWidget> {
             ListView(
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
-              children: widget.carrello.prodotti.map
-                ((prodotto) => RigaCarrelloWidget(rigaCarrello : RigaCarrello(prodotto: prodotto))).toList(),
+              children: widget.carrello.righeCarrello
+                  .map
+                ((rigaCarrello) => RigaCarrelloWidget(rigaCarrello : rigaCarrello)).toList(),
             ),
           ],
         );

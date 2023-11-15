@@ -1,4 +1,5 @@
 
+import 'package:carrello_paypal/pagamenti/Valute.dart';
 import 'package:carrello_paypal/prodotto/Prodotto.dart';
 
 Map<dynamic, dynamic> defaultCurrency = {
@@ -10,7 +11,7 @@ Map<dynamic, dynamic> defaultCurrency = {
 
 class RigaCarrello {
   final Prodotto prodotto;
-  final int quantita = 1;
+  final int quantita = 2;
 
   RigaCarrello({
     required this.prodotto,
@@ -25,7 +26,12 @@ class RigaCarrello {
       "name": prodotto.nome,
       "quantity": quantita,
       "price": prodotto.prezzo,
-      "currency": defaultCurrency["currency"]
+      "currency": Valuta.euro["currency"]
     };
+  }
+
+  @override
+  String toString() {
+    return toCarrelloItem().toString();
   }
 }

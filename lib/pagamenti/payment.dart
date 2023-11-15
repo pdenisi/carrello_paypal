@@ -99,15 +99,8 @@ class PaymentState extends State<Payment> {
     String descrizione = "The payment transaction description.";
     Map<dynamic,dynamic> valuta = Valuta.euro;
 
-    List items = [
-      {
-        "name": itemName,
-        "quantity": quantity,
-        "price": itemPrice,
-        "currency": valuta["currency"]
-      }
-    ];
-
+    List items = [];
+    items.addAll(widget.carrello.righeCarrello.map((e) => e.toCarrelloItem()).toList());
     Map<String, dynamic> temp = {
       "intent": "sale",
       "payer": {"payment_method": "paypal"},
